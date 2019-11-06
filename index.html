@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Exam cards</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main class="cards">
+
+    </main>
+    <button class="add-card-button">+</button>
+
+    <div class="modal">
+        <img src="assets/close.svg" alt="" class="close-icon">
+
+        <div class="add-card">
+            <img src="assets/flip.svg" alt="" class="flip-icon">
+
+            <div class="add-card-inner">
+                <div class="flip-card-front">
+                    <div class="row">
+                        <h2 class="title">Ask</h2>
+                    </div>
+
+                    <div class="row">
+                        <h2 class="left">Title</h2>
+                        <input class="card-title right" type="text">
+                    </div>
+
+                    <div class="row">
+                        <h2 class="left">Description</h2>
+                        <textarea class="card-text right" rows="10" cols="45" name="text"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <h2 class="left">Image</h2>
+                        <label class="upload-file right">
+                            <input name="myFile" type="file">
+                            <img src="assets/file.svg" alt="" class="upload-icon">
+                        </label>
+                    </div>
+                </div>
+                <div class="flip-card-back">
+                    <div class="row">
+                        <h2 class="title">Answer</h2>
+                    </div>
+
+                    <div class="row">
+                        <h2 class="left">Title</h2>
+                        <input class="card-title right" type="text">
+                    </div>
+
+                    <div class="row">
+                        <h2 class="left">Description</h2>
+                        <textarea class="card-text right" rows="10" cols="45" name="text"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <h2 class="left">Image</h2>
+                        <label class="upload-file right">
+                            <input name="myFile" type="file">
+                            <img src="assets/file.svg" alt="" class="upload-icon">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="add-new-card">add</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
