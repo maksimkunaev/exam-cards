@@ -3,14 +3,6 @@ const cardsData = [
         front: { text: 'text', title: 'task', image: 'https://avatars3.githubusercontent.com/u/38328222?s=460&v=4' },
         back: { text: 'text', title: 'answer', image: 'https://i0.wp.com/sitn.hms.harvard.edu/wp-content/uploads/2019/08/Moon.jpg?resize=1920%2C768' }
     },
-    {
-        front: { text: 'text', title: 'task', image: 'https://avatars3.githubusercontent.com/u/38328222?s=460&v=4' },
-        back: { text: 'text', title: 'answer', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSZH5ONUQMWnWC24l3I2l7kxu4GW8P4Tkrq7FJsr5xa4tqU_fGV' }
-    },
-    {
-        front: { text: 'text', title: 'task', image: 'https://avatars3.githubusercontent.com/u/38328222?s=460&v=4' },
-        back: { text: 'text', title: 'answer', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRfXPFNcfrcMAIWfuCFETdNLGWhTI-dHmh4woUhKTgd49qq2XZm' }
-    },
 ];
 const cardElements = document.querySelector('.cards');
 const addCard = document.querySelector('.add-card');
