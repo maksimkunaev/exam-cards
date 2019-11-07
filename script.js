@@ -26,14 +26,17 @@ document.addEventListener('updateStore', function (event) {
         store.cardsData = event.cardsData;
 
         console.log('cardsLoaded',event);
-        addButtonContainer.style.display = 'flex';
+        // addButtonContainer.style.display = 'flex';
         loadingBlock.style.display = 'none';
 
         for (let key in store.cardsData) {
             createTask(store.cardsData[key], key);
         }
+
+        localStorage.setItem('cardsData', JSON.stringify(store.cardsData));
     }
 }, false);
+
 
 flipButton.addEventListener('click', flipCard.bind(addForm, addFormInner));
 addButtonIcon.addEventListener('click', onAddButtonClick);
@@ -116,9 +119,10 @@ function createTask(data, cardId) {
     flipCardFront.appendChild(frontTitle);
     flipCardFront.appendChild(frontText);
     if (front.image) {
-        const frontImg = document.createElement('img');
+        const frontImg = document.createElement('div');
         frontImg.classList.add('image');
-        frontImg.src = front.image;
+        // frontImg.src = front.image;
+        frontImg.style.backgroundImage = `url(${front.image})` ;
 
         flipCardFront.appendChild(frontImg);
     }
@@ -127,9 +131,10 @@ function createTask(data, cardId) {
     flipCardBack.appendChild(backTitle);
     flipCardBack.appendChild(backText);
     if (back.image) {
-        const backImg = document.createElement('img');
+        const backImg = document.createElement('div');
         backImg.classList.add('image');
-        backImg.src = back.image;
+        // backImg.src = back.image;
+        backImg.style.backgroundImage = `url(${back.image})`;
 
         flipCardBack.appendChild(backImg);
     }
