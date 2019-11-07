@@ -327,3 +327,7 @@ body, html {
     background-repeat: no-repeat;
     z-index: 1;
 }
+
+.front-image-name, .back-image-name {
+    color: green;
+}

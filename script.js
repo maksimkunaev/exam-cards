@@ -9,6 +9,24 @@ const addForm = document.querySelector('.add-card');
 const frontAddCard = document.querySelector('.flip-card-front');
 const backAddCard = document.querySelector('.flip-card-back');
 
+const frontInput = document.querySelector("input[name='front-file']");
+const backInput = document.querySelector("input[name='back-file']");
+const frontImageName = document.querySelector(".front-image-name");
+const backImageName = document.querySelector(".back-image-name");
+
+frontInput.addEventListener('change', fileLoad.bind(this, frontImageName));
+backInput.addEventListener('change', fileLoad.bind(this, backImageName));
+
+
+function fileLoad(labelNode, e) {
+    const files = e.target.files;
+
+    if (files.length) {
+        const { name } = files[0];
+        labelNode.textContent = name;
+    }
+
+}
 const addButtonContainer = document.querySelector('.add-card-container');
 const loadingBlock = document.querySelector('.loading');
 const addButtonIcon = document.querySelector('.add-card-button');
@@ -26,7 +44,6 @@ document.addEventListener('updateStore', function (event) {
         store.cardsData = event.cardsData;
 
         console.log('cardsLoaded',event);
-        // addButtonContainer.style.display = 'flex';
         loadingBlock.style.display = 'none';
 
         for (let key in store.cardsData) {
@@ -118,26 +135,12 @@ function createTask(data, cardId) {
     // append elements to inner
     flipCardFront.appendChild(frontTitle);
     flipCardFront.appendChild(frontText);
-    if (front.image) {
-        const frontImg = document.createElement('div');
-        frontImg.classList.add('image');
-        // frontImg.src = front.image;
-        frontImg.style.backgroundImage = `url(${front.image})` ;
-
-        flipCardFront.appendChild(frontImg);
-    }
+    appendImage(flipCardFront, front.image);
 
     // append elements to inner
     flipCardBack.appendChild(backTitle);
     flipCardBack.appendChild(backText);
-    if (back.image) {
-        const backImg = document.createElement('div');
-        backImg.classList.add('image');
-        // backImg.src = back.image;
-        backImg.style.backgroundImage = `url(${back.image})`;
-
-        flipCardBack.appendChild(backImg);
-    }
+    appendImage(flipCardBack, back.image);
 
     // append cards to inner
     flipCardInner.appendChild(flipCardFront);
@@ -157,6 +160,14 @@ function createTask(data, cardId) {
         card.removeEventListener('click', flipCard);
         card.parentNode.removeChild(card);
         deleteCard(cardId);
+    }
+
+    function appendImage(node, src) {
+        if (!src) return;
+        const imageElem = document.createElement('div');
+        imageElem.classList.add('image');
+        imageElem.style.backgroundImage = `url(${src})` ;
+        node.appendChild(imageElem);
     }
 }
 
@@ -189,6 +200,8 @@ async function addNewCard(e) {
 
     writeCard(cardId, data)
     createTask(data, cardId);
+    frontImageName.textContent = null;
+    backImageName.textContent = null;
     addForm.reset();
 }
 
