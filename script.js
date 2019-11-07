@@ -15,6 +15,7 @@ const addForm = document.querySelector('.add-card');
 const frontAddCard = document.querySelector('.flip-card-front');
 const backAddCard = document.querySelector('.flip-card-back');
 
+const addButtonContainer = document.querySelector('.add-card-container');
 const addButtonIcon = document.querySelector('.add-card-button');
 const closeButton = document.querySelector('.close-icon');
 const modalWindow = document.querySelector('.modal');
@@ -117,11 +118,15 @@ function createTask(data) {
     flipCardInner.appendChild(flipCardFront);
     flipCardInner.appendChild(flipCardBack);
 
+
+
     card.appendChild(flipCardInner);
 
     card.addEventListener('click', flipCard.bind(card, flipCardInner));
 
-    cardElements.appendChild(card);
+    // cardElements.appendChild(card);
+    //
+    const insertedElement = cardElements.insertBefore(card, addButtonContainer);
 }
 
 cardsData.forEach(function (data) {
