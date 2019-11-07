@@ -1,14 +1,8 @@
-const cardsData = [
-    {
-        front: { text: 'text', title: 'task', image: 'https://avatars3.githubusercontent.com/u/38328222?s=460&v=4' },
-        back: { text: 'text', title: 'answer', image: 'https://i0.wp.com/sitn.hms.harvard.edu/wp-content/uploads/2019/08/Moon.jpg?resize=1920%2C768' }
-    },
-    {
-        front: { text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.', title: 'task', image: 'https://avatars3.githubusercontent.com/u/38328222?s=460&v=4' },
-        back: { text: 'Сегодня этот текст используют практически все дизайнеры, набирающие рыбу латиницей. Абзац считается каноническим во всех справочниках по типографике и предлагается к использованию в статьях, посвященных изготовлению макета верстки при отсутствии финальных текстов. В руководствах по работе с фирменным стилем крупных международных компаний именно с этих слов начинаются образцы верстки. Существуют даже издания с названием Lorem ipsum.\n' +
-                '\n', title: 'answer', image: 'https://i0.wp.com/sitn.hms.harvard.edu/wp-content/uploads/2019/08/Moon.jpg?resize=1920%2C768' }
-    },
-];
+const store = {
+    status: 'fetching',
+    cardsData: [],
+};
+
 const cardElements = document.querySelector('.cards');
 const addForm = document.querySelector('.add-card');
 
@@ -16,12 +10,30 @@ const frontAddCard = document.querySelector('.flip-card-front');
 const backAddCard = document.querySelector('.flip-card-back');
 
 const addButtonContainer = document.querySelector('.add-card-container');
+const loadingBlock = document.querySelector('.loading');
 const addButtonIcon = document.querySelector('.add-card-button');
 const closeButton = document.querySelector('.close-icon');
 const modalWindow = document.querySelector('.modal');
 const flipButton = document.querySelector('.flip-icon');
 const addFormInner = addForm.querySelector('.add-card-inner');
 const addNewCardButton = document.querySelector('.add-new-card');
+
+document.addEventListener('updateStore', function (event) {
+    console.log('updateStore', event);
+
+    if (event.customType === 'cardsLoaded') {
+        store.cardsData = event.cardsData;
+        store.status = 'success';
+
+        addButtonContainer.style.display = 'flex'
+        loadingBlock.style.display = 'none'
+
+        store.cardsData.forEach(function (data) {
+            createTask(data)
+        });
+
+    }
+}, false);
 
 flipButton.addEventListener('click', flipCard.bind(addForm, addFormInner));
 addButtonIcon.addEventListener('click', onAddButtonClick);
@@ -118,8 +130,6 @@ function createTask(data) {
     flipCardInner.appendChild(flipCardFront);
     flipCardInner.appendChild(flipCardBack);
 
-
-
     card.appendChild(flipCardInner);
 
     card.addEventListener('click', flipCard.bind(card, flipCardInner));
@@ -128,10 +138,6 @@ function createTask(data) {
     //
     const insertedElement = cardElements.insertBefore(card, addButtonContainer);
 }
-
-cardsData.forEach(function (data) {
-    createTask(data)
-});
 
 function addNewCard(e) {
     e.preventDefault();
@@ -156,6 +162,7 @@ function addNewCard(e) {
         }
     };
 
+    writeCard(store.cardsData.length, data)
     createTask(data);
     addForm.reset();
 }

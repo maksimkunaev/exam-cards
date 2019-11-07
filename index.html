@@ -9,9 +9,14 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <main class="cards">
         <div class="add-card-container">
             <button class="add-card-button">+</button>
+        </div>
+
+        <div class="loading">
+            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
         </div>
     </main>
 
@@ -75,5 +80,64 @@
     </div>
 
     <script src="script.js"></script>
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-app.js"></script>
+
+    <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-analytics.js"></script>
+
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyB0z_I4NffZ1T17FmreOeE4QGKoeW4koz8",
+            authDomain: "exam-cards.firebaseapp.com",
+            databaseURL: "https://exam-cards.firebaseio.com",
+            projectId: "exam-cards",
+            storageBucket: "exam-cards.appspot.com",
+            messagingSenderId: "155071668631",
+            appId: "1:155071668631:web:c9b6f631d48a354b57a4d2",
+            measurementId: "G-7D0ZDMZLN7"
+        };
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        var database = firebase.database().ref("data")
+
+        function writeCard(cardId, data) {
+            firebase.database().ref('cards/' + cardId).set(data);
+        }
+
+        function getCards() {
+            return new Promise(function (resolve, reject) {
+                firebase.database().ref('/cards').once('value').then(function(snapshot) {
+                    if (snapshot.val) {
+                        return resolve(snapshot.val())
+                    }
+                    reject()
+                });
+            })
+        }
+
+        getCards()
+            .then(function (result) {
+                const cardsData = result || [];
+
+                const event = document.createEvent('Event');
+                event.initEvent('updateStore', true, true);
+                event.cardsData = cardsData;
+                event.customType = 'cardsLoaded';
+
+                document.dispatchEvent(event);
+            })
+            .catch(function (error) {
+                console.log('error',error)
+            })
+    </script>
 </body>
 </html>
