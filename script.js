@@ -10,7 +10,7 @@ const cardsData = [
     },
 ];
 const cardElements = document.querySelector('.cards');
-const addCard = document.querySelector('.add-card');
+const addForm = document.querySelector('.add-card');
 
 const frontAddCard = document.querySelector('.flip-card-front');
 const backAddCard = document.querySelector('.flip-card-back');
@@ -19,10 +19,12 @@ const addButtonIcon = document.querySelector('.add-card-button');
 const closeButton = document.querySelector('.close-icon');
 const modalWindow = document.querySelector('.modal');
 const flipButton = document.querySelector('.flip-icon');
+const addFormInner = addForm.querySelector('.add-card-inner');
 const addNewCardButton = document.querySelector('.add-new-card');
-flipButton.addEventListener('click', flipCard.bind(addCard, addCard.querySelector('.add-card-inner')));
+
+flipButton.addEventListener('click', flipCard.bind(addForm, addFormInner));
 addButtonIcon.addEventListener('click', onAddButtonClick);
-addNewCardButton.addEventListener('click', addNewCard);
+addForm.addEventListener('submit', addNewCard);
 
 modalWindow.addEventListener('click', onClose, true);
 
@@ -126,7 +128,8 @@ cardsData.forEach(function (data) {
     createTask(data)
 });
 
-function addNewCard() {
+function addNewCard(e) {
+    e.preventDefault();
     const frontTitle = frontAddCard.querySelector('.card-title').value;
     const frontDescription = frontAddCard.querySelector('.card-text').value;
     const frontImageSrc = 'https://thenypost.files.wordpress.com/2019/08/space-signals-3246.jpg?quality=90&strip=all&strip=all'
@@ -148,5 +151,6 @@ function addNewCard() {
         }
     };
 
-    createTask(data)
+    createTask(data);
+    addForm.reset();
 }
