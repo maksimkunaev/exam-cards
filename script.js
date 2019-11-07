@@ -22,16 +22,16 @@ document.addEventListener('updateStore', function (event) {
     console.log('updateStore', event);
 
     if (event.customType === 'cardsLoaded') {
-        store.cardsData = event.cardsData;
         store.status = 'success';
+        store.cardsData = event.cardsData;
 
-        addButtonContainer.style.display = 'flex'
-        loadingBlock.style.display = 'none'
+        console.log('cardsLoaded',event);
+        addButtonContainer.style.display = 'flex';
+        loadingBlock.style.display = 'none';
 
-        store.cardsData.forEach(function (data) {
-            createTask(data)
-        });
-
+        for (let key in store.cardsData) {
+            createTask(store.cardsData[key], key);
+        }
     }
 }, false);
 
@@ -75,7 +75,7 @@ function onClose(e) {
     return modalWindow.classList.remove('visible')
 }
 
-function createTask(data) {
+function createTask(data, cardId) {
     const { front, back } = data;
 
     const card = document.createElement('div');
@@ -96,10 +96,6 @@ function createTask(data) {
     frontText.textContent = front.text;
     frontText.classList.add('text');
 
-    const frontImg = document.createElement('img');
-    frontImg.classList.add('image');
-    frontImg.src = front.image;
-
     // fill back card
     const flipCardBack = document.createElement('div');
     flipCardBack.classList.add('flip-card-back');
@@ -112,42 +108,64 @@ function createTask(data) {
     backText.textContent = back.text;
     backText.classList.add('text');
 
-    const backImg = document.createElement('img');
-    backImg.classList.add('image');
-    backImg.src = back.image;
+    const deleteIcon = document.createElement('div');
+    deleteIcon.classList.add('remove-icon');
+    deleteIcon.addEventListener('click', removeCard.bind(this, cardId));
 
     // append elements to inner
     flipCardFront.appendChild(frontTitle);
     flipCardFront.appendChild(frontText);
-    flipCardFront.appendChild(frontImg);
+    if (front.image) {
+        const frontImg = document.createElement('img');
+        frontImg.classList.add('image');
+        frontImg.src = front.image;
+
+        flipCardFront.appendChild(frontImg);
+    }
 
     // append elements to inner
     flipCardBack.appendChild(backTitle);
     flipCardBack.appendChild(backText);
-    flipCardBack.appendChild(backImg);
+    if (back.image) {
+        const backImg = document.createElement('img');
+        backImg.classList.add('image');
+        backImg.src = back.image;
+
+        flipCardBack.appendChild(backImg);
+    }
 
     // append cards to inner
     flipCardInner.appendChild(flipCardFront);
     flipCardInner.appendChild(flipCardBack);
+    card.appendChild(deleteIcon);
 
     card.appendChild(flipCardInner);
 
     card.addEventListener('click', flipCard.bind(card, flipCardInner));
 
-    // cardElements.appendChild(card);
-    //
     const insertedElement = cardElements.insertBefore(card, addButtonContainer);
+
+    async function removeCard(cardId, e) {
+        e.preventDefault();
+
+        deleteIcon.removeEventListener('click', removeCard);
+        card.removeEventListener('click', flipCard);
+        card.parentNode.removeChild(card);
+        deleteCard(cardId);
+    }
 }
 
-function addNewCard(e) {
+async function addNewCard(e) {
     e.preventDefault();
     const frontTitle = frontAddCard.querySelector('.card-title').value;
     const frontDescription = frontAddCard.querySelector('.card-text').value;
-    const frontImageSrc = 'https://thenypost.files.wordpress.com/2019/08/space-signals-3246.jpg?quality=90&strip=all&strip=all'
+    const frontFile = frontAddCard.querySelector("input[name='front-file']");
+    const frontImageSrc = await getImageSource(frontFile);
 
     const backTitle = backAddCard.querySelector('.card-title').value;
     const backDescription = backAddCard.querySelector('.card-text').value;
-    const backImageSrc = 'https://ichef.bbci.co.uk/news/660/cpsprodpb/7D66/production/_105120123_gettyimages-831502910.jpg'
+    const backFile = backAddCard.querySelector("input[name='back-file']");
+    const backImageSrc = await getImageSource(backFile);
 
     const data = {
         front: {
@@ -162,7 +180,29 @@ function addNewCard(e) {
         }
     };
 
-    writeCard(store.cardsData.length, data)
-    createTask(data);
+    const cardId = Date.now();
+
+    writeCard(cardId, data)
+    createTask(data, cardId);
     addForm.reset();
+}
+
+async function getImageSource(inputElement) {
+    return new Promise(function (resolve, reject) {
+        if (!inputElement || !inputElement.files || !inputElement.files[0]) resolve(null);
+        const file = inputElement.files[0];
+        const reader  = new FileReader();
+        let src = '';
+
+        reader.onloadend = function() {
+            src = reader.result;
+            resolve(src);
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            reject('error reading file')
+        }
+    })
 }

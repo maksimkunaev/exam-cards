@@ -45,7 +45,7 @@
                     <div class="row file-row">
                         <h2 class="left">Image</h2>
                         <label class="upload-file right">
-                            <input name="myFile" type="file">
+                            <input name="front-file" type="file">
                             <img src="assets/file.svg" alt="" class="upload-icon">
                         </label>
                     </div>
@@ -68,7 +68,7 @@
                     <div class="row file-row">
                         <h2 class="left">Image</h2>
                         <label class="upload-file right">
-                            <input name="myFile" type="file">
+                            <input name="back-file" type="file">
                             <img src="assets/file.svg" alt="" class="upload-icon">
                         </label>
                     </div>
@@ -80,21 +80,10 @@
     </div>
 
     <script src="script.js"></script>
-    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-app.js"></script>
-
-    <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
-    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-analytics.js"></script>
-
-    <!-- Add Firebase products that you want to use -->
-    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.9.1/firebase-storage.js"></script>
     <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase.js"></script>
 
     <script>
-        // Your web app's Firebase configuration
-        var firebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyB0z_I4NffZ1T17FmreOeE4QGKoeW4koz8",
             authDomain: "exam-cards.firebaseapp.com",
             databaseURL: "https://exam-cards.firebaseio.com",
@@ -106,11 +95,15 @@
         };
         // Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
-        firebase.analytics();
-        var database = firebase.database().ref("data")
-
+        const database = firebase.database().ref("data")
+        const remotePath = 'cards';
         function writeCard(cardId, data) {
             firebase.database().ref('cards/' + cardId).set(data);
+        }
+
+        function deleteCard(cardId) {
+            console.log('cardId', cardId);
+            firebase.database().ref('cards/' + cardId).remove();
         }
 
         function getCards() {
