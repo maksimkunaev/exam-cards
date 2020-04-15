@@ -90,7 +90,13 @@ body, html {
     position: absolute;
     width: 100%;
     height: 100%;
+
+    -webkit-perspective: 0;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translate3d(0,0,0);
+    visibility:visible;
     backface-visibility: hidden;
+
     padding: 5px;
 
     background-color: #bbb;
@@ -101,11 +107,12 @@ body, html {
 
     justify-content: space-around;
     flex-direction: column;
+    box-shadow: 1px 1px 3px 2px #1b19193b;
 }
 
 /* Style the front side (fallback if image is missing) */
 .flip-card-front {
-    background-color: #bbb;
+    background-color: transparent;
     color: black;
     border-radius: 8px;
 
@@ -114,7 +121,7 @@ body, html {
 
 /* Style the back side */
 .flip-card-back {
-    background-color: dodgerblue;
+    background-color: #676767;
     color: white;
     transform: rotateY(180deg);
     border-radius: 8px;
