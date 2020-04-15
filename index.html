@@ -10,25 +10,29 @@
 </head>
 <body>
     <main class="cards">
+        <div class="add-card-container">
+            <button class="add-card-button">+</button>
+        </div>
 
+        <div class="loading">
+            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        </div>
     </main>
-    <button class="add-card-button">+</button>
-
     <div class="modal">
         <img src="assets/close.svg" alt="" class="close-icon">
 
-        <div class="add-card">
+        <form class="add-card">
             <img src="assets/flip.svg" alt="" class="flip-icon">
 
             <div class="add-card-inner">
-                <div class="flip-card-front">
+                <div class="flip-card-front ask-card">
                     <div class="row">
                         <h2 class="title">Ask</h2>
                     </div>
 
                     <div class="row">
                         <h2 class="left">Title</h2>
-                        <input class="card-title right" type="text">
+                        <input class="card-title right input" type="text">
                     </div>
 
                     <div class="row">
@@ -36,22 +40,23 @@
                         <textarea class="card-text right" rows="10" cols="45" name="text"></textarea>
                     </div>
 
-                    <div class="row">
+                    <div class="row file-row">
                         <h2 class="left">Image</h2>
                         <label class="upload-file right">
-                            <input name="myFile" type="file">
+                            <span class="front-image-name"></span>
+                            <input name="front-file" type="file">
                             <img src="assets/file.svg" alt="" class="upload-icon">
                         </label>
                     </div>
                 </div>
-                <div class="flip-card-back">
+                <div class="flip-card-back answer-card">
                     <div class="row">
                         <h2 class="title">Answer</h2>
                     </div>
 
                     <div class="row">
                         <h2 class="left">Title</h2>
-                        <input class="card-title right" type="text">
+                        <input class="card-title right input" type="text">
                     </div>
 
                     <div class="row">
@@ -59,20 +64,73 @@
                         <textarea class="card-text right" rows="10" cols="45" name="text"></textarea>
                     </div>
 
-                    <div class="row">
+                    <div class="row file-row">
                         <h2 class="left">Image</h2>
                         <label class="upload-file right">
-                            <input name="myFile" type="file">
+                            <span class="back-image-name"></span>
+                            <input name="back-file" type="file">
                             <img src="assets/file.svg" alt="" class="upload-icon">
                         </label>
                     </div>
                 </div>
             </div>
 
-            <button class="add-new-card">add</button>
-        </div>
+            <button class="add-new-card" type="submit">add</button>
+        </form>
     </div>
 
     <script src="script.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyB0z_I4NffZ1T17FmreOeE4QGKoeW4koz8",
+            authDomain: "exam-cards.firebaseapp.com",
+            databaseURL: "https://exam-cards.firebaseio.com",
+            projectId: "exam-cards",
+            storageBucket: "exam-cards.appspot.com",
+            messagingSenderId: "155071668631",
+            appId: "1:155071668631:web:c9b6f631d48a354b57a4d2",
+            measurementId: "G-7D0ZDMZLN7"
+        };
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database().ref("data")
+        const remotePath = 'cards';
+        function writeCard(cardId, data) {
+            firebase.database().ref('cards/' + cardId).set(data);
+        }
+
+        function deleteCard(cardId) {
+            console.log('cardId', cardId);
+            firebase.database().ref('cards/' + cardId).remove();
+        }
+
+        function getCards() {
+            return new Promise(function (resolve, reject) {
+                firebase.database().ref('/cards').once('value').then(function(snapshot) {
+                    if (snapshot.val) {
+                        return resolve(snapshot.val())
+                    }
+                    reject()
+                });
+            })
+        }
+
+        getCards()
+            .then(function (result) {
+                const cardsData = result || [];
+
+                const event = document.createEvent('Event');
+                event.initEvent('updateStore', true, true);
+                event.cardsData = cardsData;
+                event.customType = 'cardsLoaded';
+
+                document.dispatchEvent(event);
+            })
+            .catch(function (error) {
+                console.log('error',error)
+            })
+    </script>
 </body>
 </html>

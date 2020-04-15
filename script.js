@@ -1,36 +1,78 @@
-const cardsData = [
-    {
-        front: { text: 'text', title: 'task', image: 'https://avatars3.githubusercontent.com/u/38328222?s=460&v=4' },
-        back: { text: 'text', title: 'answer', image: 'https://i0.wp.com/sitn.hms.harvard.edu/wp-content/uploads/2019/08/Moon.jpg?resize=1920%2C768' }
-    },
-    {
-        front: { text: 'text', title: 'task', image: 'https://avatars3.githubusercontent.com/u/38328222?s=460&v=4' },
-        back: { text: 'text', title: 'answer', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSZH5ONUQMWnWC24l3I2l7kxu4GW8P4Tkrq7FJsr5xa4tqU_fGV' }
-    },
-    {
-        front: { text: 'text', title: 'task', image: 'https://avatars3.githubusercontent.com/u/38328222?s=460&v=4' },
-        back: { text: 'text', title: 'answer', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRfXPFNcfrcMAIWfuCFETdNLGWhTI-dHmh4woUhKTgd49qq2XZm' }
-    },
-];
+const store = {
+    status: 'fetching',
+    cardsData: [],
+};
+
 const cardElements = document.querySelector('.cards');
-const addCard = document.querySelector('.add-card');
+const addForm = document.querySelector('.add-card');
 
 const frontAddCard = document.querySelector('.flip-card-front');
 const backAddCard = document.querySelector('.flip-card-back');
 
+const frontInput = document.querySelector("input[name='front-file']");
+const backInput = document.querySelector("input[name='back-file']");
+const frontImageName = document.querySelector(".front-image-name");
+const backImageName = document.querySelector(".back-image-name");
+
+frontInput.addEventListener('change', fileLoad.bind(this, frontImageName));
+backInput.addEventListener('change', fileLoad.bind(this, backImageName));
+
+
+function fileLoad(labelNode, e) {
+    const files = e.target.files;
+
+    if (files.length) {
+        const { name } = files[0];
+        labelNode.textContent = name;
+    }
+
+}
+const addButtonContainer = document.querySelector('.add-card-container');
+const loadingBlock = document.querySelector('.loading');
 const addButtonIcon = document.querySelector('.add-card-button');
 const closeButton = document.querySelector('.close-icon');
 const modalWindow = document.querySelector('.modal');
 const flipButton = document.querySelector('.flip-icon');
+const addFormInner = addForm.querySelector('.add-card-inner');
 const addNewCardButton = document.querySelector('.add-new-card');
-flipButton.addEventListener('click', flipCard.bind(addCard, addCard.querySelector('.add-card-inner')));
+
+document.addEventListener('updateStore', function (event) {
+    console.log('updateStore', event);
+
+    if (event.customType === 'cardsLoaded') {
+        store.status = 'success';
+        store.cardsData = event.cardsData;
+
+        console.log('cardsLoaded',event);
+        loadingBlock.style.display = 'none';
+
+        for (let key in store.cardsData) {
+            createTask(store.cardsData[key], key);
+        }
+
+        localStorage.setItem('cardsData', JSON.stringify(store.cardsData));
+    }
+}, false);
+
+
+flipButton.addEventListener('click', flipCard.bind(addForm, addFormInner));
 addButtonIcon.addEventListener('click', onAddButtonClick);
-addNewCardButton.addEventListener('click', addNewCard);
+addForm.addEventListener('submit', addNewCard);
 
 modalWindow.addEventListener('click', onClose, true);
 
 function flipCard(card) {
     card.classList.toggle('recovered');
+
+    setTimeout(function () {
+        if (card.classList.contains('recovered')) {
+            card.querySelector('.flip-card-front').classList.remove('scrollable');
+            card.querySelector('.flip-card-back').classList.add('scrollable');
+        } else {
+            card.querySelector('.flip-card-front').classList.add('scrollable');
+            card.querySelector('.flip-card-back').classList.remove('scrollable');
+        }
+    }, 500)
 }
 
 function onAddButtonClick() {
@@ -53,7 +95,7 @@ function onClose(e) {
     return modalWindow.classList.remove('visible')
 }
 
-function createTask(data) {
+function createTask(data, cardId) {
     const { front, back } = data;
 
     const card = document.createElement('div');
@@ -74,10 +116,6 @@ function createTask(data) {
     frontText.textContent = front.text;
     frontText.classList.add('text');
 
-    const frontImg = document.createElement('img');
-    frontImg.classList.add('image');
-    frontImg.src = front.image;
-
     // fill back card
     const flipCardBack = document.createElement('div');
     flipCardBack.classList.add('flip-card-back');
@@ -90,43 +128,60 @@ function createTask(data) {
     backText.textContent = back.text;
     backText.classList.add('text');
 
-    const backImg = document.createElement('img');
-    backImg.classList.add('image');
-    backImg.src = back.image;
+    const deleteIcon = document.createElement('div');
+    deleteIcon.classList.add('remove-icon');
+    deleteIcon.addEventListener('click', removeCard.bind(this, cardId));
 
     // append elements to inner
     flipCardFront.appendChild(frontTitle);
     flipCardFront.appendChild(frontText);
-    flipCardFront.appendChild(frontImg);
+    appendImage(flipCardFront, front.image);
 
     // append elements to inner
     flipCardBack.appendChild(backTitle);
     flipCardBack.appendChild(backText);
-    flipCardBack.appendChild(backImg);
+    appendImage(flipCardBack, back.image);
 
     // append cards to inner
     flipCardInner.appendChild(flipCardFront);
     flipCardInner.appendChild(flipCardBack);
+    card.appendChild(deleteIcon);
 
     card.appendChild(flipCardInner);
 
     card.addEventListener('click', flipCard.bind(card, flipCardInner));
 
-    cardElements.appendChild(card);
+    const insertedElement = cardElements.insertBefore(card, addButtonContainer);
+
+    async function removeCard(cardId, e) {
+        e.preventDefault();
+
+        deleteIcon.removeEventListener('click', removeCard);
+        card.removeEventListener('click', flipCard);
+        card.parentNode.removeChild(card);
+        deleteCard(cardId);
+    }
+
+    function appendImage(node, src) {
+        if (!src) return;
+        const imageElem = document.createElement('div');
+        imageElem.classList.add('image');
+        imageElem.style.backgroundImage = `url(${src})` ;
+        node.appendChild(imageElem);
+    }
 }
 
-cardsData.forEach(function (data) {
-    createTask(data)
-});
-
-function addNewCard() {
+async function addNewCard(e) {
+    e.preventDefault();
     const frontTitle = frontAddCard.querySelector('.card-title').value;
     const frontDescription = frontAddCard.querySelector('.card-text').value;
-    const frontImageSrc = 'https://thenypost.files.wordpress.com/2019/08/space-signals-3246.jpg?quality=90&strip=all&strip=all'
+    const frontFile = frontAddCard.querySelector("input[name='front-file']");
+    const frontImageSrc = await getImageSource(frontFile);
 
     const backTitle = backAddCard.querySelector('.card-title').value;
     const backDescription = backAddCard.querySelector('.card-text').value;
-    const backImageSrc = 'https://ichef.bbci.co.uk/news/660/cpsprodpb/7D66/production/_105120123_gettyimages-831502910.jpg'
+    const backFile = backAddCard.querySelector("input[name='back-file']");
+    const backImageSrc = await getImageSource(backFile);
 
     const data = {
         front: {
@@ -141,5 +196,31 @@ function addNewCard() {
         }
     };
 
-    createTask(data)
+    const cardId = Date.now();
+
+    writeCard(cardId, data)
+    createTask(data, cardId);
+    frontImageName.textContent = null;
+    backImageName.textContent = null;
+    addForm.reset();
+}
+
+async function getImageSource(inputElement) {
+    return new Promise(function (resolve, reject) {
+        if (!inputElement || !inputElement.files || !inputElement.files[0]) resolve(null);
+        const file = inputElement.files[0];
+        const reader  = new FileReader();
+        let src = '';
+
+        reader.onloadend = function() {
+            src = reader.result;
+            resolve(src);
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            reject('error reading file')
+        }
+    })
 }
